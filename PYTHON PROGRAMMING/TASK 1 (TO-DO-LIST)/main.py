@@ -11,6 +11,8 @@ def newTask():
     """
     task = my_entry.get()
     if task != "":
+        with open(file=r"TASK 1 (TO-DO-LIST)\todos.txt", mode="a", encoding="UTF-8") as data_file:
+            data_file.write(f"{task}\n")
         lb.insert(END, task)
         my_entry.delete(0, "end")
     else:
@@ -21,6 +23,20 @@ def deleteTask():
     """
         Deletes the tasks from teh to-do list
     """
+    marked = lb.curselection()
+    if marked:
+        del_text = lb.get(marked)
+        # Read the content of the file
+        with open(r"TASK 1 (TO-DO-LIST)\todos.txt", 'r', encoding="utf-8") as file:
+            lines = file.readlines()
+
+        # Remove the specified line
+        lines = [line for line in lines if line != del_text]
+
+        # Write the modified content back to the file
+        with open(r"TASK 1 (TO-DO-LIST)\todos.txt", 'w', encoding="utf-8") as file:
+            file.writelines(lines)
+
     lb.delete(ANCHOR)
 
 
@@ -32,12 +48,23 @@ def mark_task():
     if marked:
         temp=marked[0]
         #store the text of selected item in a string
-        temp_marked=lb.get(marked)
+        task=lb.get(marked)
         #update it 
-        temp_marked=temp_marked+" ✔"
+        temp_marked=task+" ✔"
         #delete it then insert it 
+
+        with open(r"TASK 1 (TO-DO-LIST)\todos.txt", 'r', encoding="utf-8") as file:
+            lines = file.readlines()
+
+        # Remove the specified line
+        lines = [line for line in lines if line.strip() != task]
+        lines.append(f"{temp_marked}\n")
+
+        # Write the modified content back to the file
+        with open(r"TASK 1 (TO-DO-LIST)\todos.txt", 'w', encoding="utf-8") as file:
+            file.writelines(lines)
         lb.delete(temp)
-        lb.insert(temp,temp_marked)
+        lb.insert(END, temp_marked)
     else:
         messagebox.showwarning("Warning", "Please first selct a task.")
 
@@ -74,6 +101,12 @@ sb.pack(side=RIGHT, fill=BOTH)
 
 lb.config(yscrollcommand=sb.set)
 sb.config(command=lb.yview)
+
+with open(r"TASK 1 (TO-DO-LIST)\todos.txt", "r", encoding="utf-8") as file:
+    lines = file.readlines()
+
+for line in lines:
+    lb.insert(END, line)
 
 # Create an entry field where we can type the tasks of our choice 
 my_entry = Entry(
